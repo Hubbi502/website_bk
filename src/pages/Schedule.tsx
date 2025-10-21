@@ -118,16 +118,21 @@ const Schedule = () => {
     v.status === "approved" || v.status === "pending"
   ).slice(0, 5);
 
+  const handleBooking = (counselorName: string, slot: string) => {
+    setSelectedSlot(`${counselorName} - ${slot}`);
+    toast.success("Appointment request submitted!", {
+      description: `Your request for ${slot} with ${counselorName} has been sent for approval.`
+    });
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "approved":
+      case "confirmed":
         return <CheckCircle2 className="h-5 w-5 text-green-600" />;
       case "pending":
         return <AlertCircle className="h-5 w-5 text-yellow-600" />;
       case "cancelled":
         return <XCircle className="h-5 w-5 text-red-600" />;
-      case "completed":
-        return <CheckCircle2 className="h-5 w-5 text-blue-600" />;
       default:
         return null;
     }
@@ -135,10 +140,9 @@ const Schedule = () => {
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, string> = {
-      approved: "bg-green-100 text-green-800 hover:bg-green-100",
+      confirmed: "bg-green-100 text-green-800 hover:bg-green-100",
       pending: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
-      cancelled: "bg-red-100 text-red-800 hover:bg-red-100",
-      completed: "bg-blue-100 text-blue-800 hover:bg-blue-100"
+      cancelled: "bg-red-100 text-red-800 hover:bg-red-100"
     };
     return variants[status] || "";
   };
@@ -215,159 +219,7 @@ const Schedule = () => {
 
         {/* Available Counselors */}
         <section>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold">Buat Jadwal Kunjungan Baru</h2>
-            <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
-              <DialogTrigger asChild>
-                <Button size="lg" className="gap-2">
-                  <Send className="h-5 w-5" />
-                  Ajukan Kunjungan
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Form Pengajuan Kunjungan ke Guru BK</DialogTitle>
-                  <DialogDescription>
-                    Isi form di bawah ini untuk mengajukan jadwal kunjungan ke Guru BK
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="studentName">
-                        Nama Lengkap <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="studentName"
-                        placeholder="Masukkan nama lengkap"
-                        value={visitForm.studentName}
-                        onChange={(e) => setVisitForm({ ...visitForm, studentName: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="class">
-                        Kelas <span className="text-red-500">*</span>
-                      </Label>
-                      <Select 
-                        value={visitForm.class} 
-                        onValueChange={(value) => setVisitForm({ ...visitForm, class: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih kelas" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {classes.map((cls) => (
-                            <SelectItem key={cls} value={cls}>
-                              {cls}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email (opsional)</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="email@example.com"
-                        value={visitForm.email}
-                        onChange={(e) => setVisitForm({ ...visitForm, email: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">No. Telepon (opsional)</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="08xx xxxx xxxx"
-                        value={visitForm.phone}
-                        onChange={(e) => setVisitForm({ ...visitForm, phone: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="visitDate">
-                        Tanggal Kunjungan <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="visitDate"
-                        type="date"
-                        min={new Date().toISOString().split('T')[0]}
-                        value={visitForm.visitDate}
-                        onChange={(e) => setVisitForm({ ...visitForm, visitDate: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="visitTime">
-                        Waktu Kunjungan <span className="text-red-500">*</span>
-                      </Label>
-                      <Select 
-                        value={visitForm.visitTime} 
-                        onValueChange={(value) => setVisitForm({ ...visitForm, visitTime: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih waktu" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {timeSlots.map((time) => (
-                            <SelectItem key={time} value={time}>
-                              {time} WIB
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="reason">
-                      Keperluan/Tujuan Kunjungan <span className="text-red-500">*</span>
-                    </Label>
-                    <Textarea
-                      id="reason"
-                      placeholder="Jelaskan keperluan atau tujuan kunjungan Anda..."
-                      value={visitForm.reason}
-                      onChange={(e) => setVisitForm({ ...visitForm, reason: e.target.value })}
-                      rows={4}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Informasi ini akan membantu Guru BK untuk mempersiapkan sesi konseling
-                    </p>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setIsBookingOpen(false);
-                      setVisitForm({
-                        studentName: "",
-                        class: "",
-                        email: "",
-                        phone: "",
-                        visitDate: "",
-                        visitTime: "",
-                        reason: "",
-                      });
-                    }}
-                  >
-                    Batal
-                  </Button>
-                  <Button onClick={handleSubmitVisit}>
-                    <Send className="h-4 w-4 mr-2" />
-                    Kirim Pengajuan
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-
-          {/* Info Cards */}
+          <h2 className="text-2xl font-semibold mb-6">Book a New Session</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {counselors.map((counselor, index) => (
               <Card 
@@ -383,19 +235,20 @@ const Schedule = () => {
                   <CardDescription className="text-center">{counselor.specialty}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-center">Tersedia:</p>
-                    <div className="space-y-1">
-                      {counselor.availability.map((slot) => (
-                        <div
-                          key={slot}
-                          className="text-sm text-center p-2 rounded bg-accent/50 flex items-center justify-center gap-2"
-                        >
-                          <Clock className="h-4 w-4" />
-                          {slot}
-                        </div>
-                      ))}
-                    </div>
+                  <div className="space-y-2 mb-4">
+                    <p className="text-sm font-medium">Available Slots:</p>
+                    {counselor.availability.map((slot) => (
+                      <Button
+                        key={slot}
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-start gap-2"
+                        onClick={() => handleBooking(counselor.name, slot)}
+                      >
+                        <Clock className="h-4 w-4" />
+                        {slot}
+                      </Button>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
@@ -406,27 +259,15 @@ const Schedule = () => {
         {/* Information Card */}
         <Card className="mt-12 bg-accent/50">
           <CardHeader>
-            <CardTitle>Panduan Pengajuan Kunjungan</CardTitle>
+            <CardTitle>How It Works</CardTitle>
           </CardHeader>
           <CardContent>
             <ol className="list-decimal list-inside space-y-2 text-muted-foreground">
-              <li>Klik tombol "Ajukan Kunjungan" dan isi form dengan lengkap</li>
-              <li>Pilih tanggal dan waktu yang sesuai dengan jadwal Anda</li>
-              <li>Jelaskan keperluan kunjungan dengan jelas</li>
-              <li>Tunggu konfirmasi persetujuan dari Guru BK</li>
-              <li>Cek status kunjungan Anda di bagian "Jadwal Kunjungan Anda"</li>
-              <li>Datang tepat waktu sesuai jadwal yang telah disetujui</li>
+              <li>Select a counselor and available time slot that works for you</li>
+              <li>Your appointment request will be sent for approval</li>
+              <li>You'll receive a notification once the counselor confirms</li>
+              <li>Attend your session at the scheduled time</li>
             </ol>
-            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-              <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
-                💡 Tips Penting:
-              </p>
-              <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-                <li>• Ajukan kunjungan minimal H-1 sebelum tanggal yang diinginkan</li>
-                <li>• Pastikan nomor telepon/email aktif untuk menerima konfirmasi</li>
-                <li>• Jika berhalangan hadir, segera hubungi Guru BK</li>
-              </ul>
-            </div>
           </CardContent>
         </Card>
       </div>
