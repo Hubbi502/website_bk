@@ -23,7 +23,7 @@ const initializeStorage = () => {
       {
         id: 1,
         studentName: "Ahmad Fauzi",
-        class: "XI IPA 1",
+        class: "XI RPL 1",
         visitDate: "2024-01-20",
         visitTime: "10:00",
         reason: "Konsultasi masalah akademik",
@@ -32,32 +32,6 @@ const initializeStorage = () => {
         createdAt: new Date().toISOString(),
         email: "ahmad@email.com",
         phone: "081234567890"
-      },
-      {
-        id: 2,
-        studentName: "Siti Nurhaliza",
-        class: "XII IPS 2",
-        visitDate: "2024-01-20",
-        visitTime: "11:00",
-        reason: "Konseling pribadi",
-        status: "approved",
-        notes: "",
-        createdAt: new Date().toISOString(),
-        email: "siti@email.com",
-        phone: "081234567891"
-      },
-      {
-        id: 3,
-        studentName: "Budi Santoso",
-        class: "X MIPA 3",
-        visitDate: "2024-01-19",
-        visitTime: "09:00",
-        reason: "Bimbingan karir",
-        status: "completed",
-        notes: "Sudah diberikan arahan untuk jurusan kuliah",
-        createdAt: new Date().toISOString(),
-        email: "budi@email.com",
-        phone: "081234567892"
       }
     ];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultVisits));

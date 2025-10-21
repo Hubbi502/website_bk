@@ -44,9 +44,9 @@ const Schedule = () => {
   ];
 
   const classes = [
-    "X IPA 1", "X IPA 2", "X IPS 1", "X IPS 2",
-    "XI IPA 1", "XI IPA 2", "XI IPS 1", "XI IPS 2",
-    "XII IPA 1", "XII IPA 2", "XII IPS 1", "XII IPS 2"
+    "X RPL 1", "X RPL 2", "X SIJA 1", "X SIJA 2",
+    "XI RPL 1", "XI RPL 2", "XI SIJA 1", "XI SIJA 2",
+    "XII RPL 1", "XII RPL 2", "XII SIJA 1", "XII SIJA 2"
   ];
 
   const handleSubmitVisit = () => {
