@@ -13,7 +13,6 @@ import Navbar from "@/components/Navbar";
 import { addVisit, getVisits, type Visit } from "@/lib/visitStorage";
 
 const Schedule = () => {
-  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [myVisits, setMyVisits] = useState<Visit[]>([]);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   
@@ -93,37 +92,9 @@ const Schedule = () => {
     });
   };
 
-  const counselors = [
-    {
-      id: "1",
-      name: "Dr. Sarah Johnson",
-      specialty: "Academic & Career Counseling",
-      availability: ["Monday 10:00 AM", "Wednesday 2:00 PM", "Friday 1:00 PM"]
-    },
-    {
-      id: "2", 
-      name: "Mr. David Chen",
-      specialty: "Mental Health & Personal Development",
-      availability: ["Tuesday 9:00 AM", "Thursday 11:00 AM", "Friday 3:00 PM"]
-    },
-    {
-      id: "3",
-      name: "Ms. Maria Garcia",
-      specialty: "Social & Emotional Support",
-      availability: ["Monday 1:00 PM", "Wednesday 10:00 AM", "Thursday 2:00 PM"]
-    }
-  ];
-
   const upcomingAppointments = myVisits.filter(v => 
     v.status === "approved" || v.status === "pending"
   ).slice(0, 5);
-
-  const handleBooking = (counselorName: string, slot: string) => {
-    setSelectedSlot(`${counselorName} - ${slot}`);
-    toast.success("Appointment request submitted!", {
-      description: `Your request for ${slot} with ${counselorName} has been sent for approval.`
-    });
-  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -153,9 +124,9 @@ const Schedule = () => {
       
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Counseling Schedule</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Jadwal Kunjungan BK</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Book a session with our experienced counselors or view your upcoming appointments
+            Ajukan jadwal kunjungan ke Guru BK untuk konsultasi akademik, karir, atau pribadi
           </p>
         </div>
 
@@ -217,57 +188,284 @@ const Schedule = () => {
           )}
         </section>
 
-        {/* Available Counselors */}
+        {/* Form Kunjungan Baru */}
         <section>
-          <h2 className="text-2xl font-semibold mb-6">Book a New Session</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {counselors.map((counselor, index) => (
-              <Card 
-                key={counselor.id} 
-                className="shadow-card hover:shadow-elevated transition-all animate-slide-up"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <CardHeader>
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <User className="h-8 w-8 text-primary" />
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold">Buat Jadwal Kunjungan</h2>
+            <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
+              <DialogTrigger asChild>
+                <Button size="lg" className="gap-2">
+                  <Send className="h-4 w-4" />
+                  Ajukan Kunjungan Baru
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Form Pengajuan Kunjungan ke Guru BK</DialogTitle>
+                  <DialogDescription>
+                    Lengkapi formulir di bawah untuk mengajukan jadwal kunjungan ke Guru BK
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4 py-4">
+                  {/* Informasi Pribadi */}
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-sm text-slate-700 border-b pb-2">
+                      Informasi Pribadi
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="studentName">
+                          Nama Lengkap <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="studentName"
+                          placeholder="Contoh: Ahmad Fauzi"
+                          value={visitForm.studentName}
+                          onChange={(e) => setVisitForm({ ...visitForm, studentName: e.target.value })}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="class">
+                          Kelas <span className="text-red-500">*</span>
+                        </Label>
+                        <Select
+                          value={visitForm.class}
+                          onValueChange={(value) => setVisitForm({ ...visitForm, class: value })}
+                        >
+                          <SelectTrigger id="class">
+                            <SelectValue placeholder="Pilih kelas" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {classes.map((cls) => (
+                              <SelectItem key={cls} value={cls}>
+                                {cls}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email (opsional)</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="email@contoh.com"
+                          value={visitForm.email}
+                          onChange={(e) => setVisitForm({ ...visitForm, email: e.target.value })}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">No. Telepon (opsional)</Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="081234567890"
+                          value={visitForm.phone}
+                          onChange={(e) => setVisitForm({ ...visitForm, phone: e.target.value })}
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <CardTitle className="text-center">{counselor.name}</CardTitle>
-                  <CardDescription className="text-center">{counselor.specialty}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 mb-4">
-                    <p className="text-sm font-medium">Available Slots:</p>
-                    {counselor.availability.map((slot) => (
-                      <Button
-                        key={slot}
-                        variant="outline"
-                        size="sm"
-                        className="w-full justify-start gap-2"
-                        onClick={() => handleBooking(counselor.name, slot)}
-                      >
-                        <Clock className="h-4 w-4" />
-                        {slot}
-                      </Button>
-                    ))}
+
+                  {/* Jadwal Kunjungan */}
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-sm text-slate-700 border-b pb-2">
+                      Jadwal Kunjungan
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="visitDate">
+                          Tanggal Kunjungan <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="visitDate"
+                          type="date"
+                          min={new Date().toISOString().split('T')[0]}
+                          value={visitForm.visitDate}
+                          onChange={(e) => setVisitForm({ ...visitForm, visitDate: e.target.value })}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="visitTime">
+                          Waktu Kunjungan <span className="text-red-500">*</span>
+                        </Label>
+                        <Select
+                          value={visitForm.visitTime}
+                          onValueChange={(value) => setVisitForm({ ...visitForm, visitTime: value })}
+                        >
+                          <SelectTrigger id="visitTime">
+                            <SelectValue placeholder="Pilih waktu" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {timeSlots.map((time) => (
+                              <SelectItem key={time} value={time}>
+                                {time} WIB
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+
+                  {/* Keperluan */}
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-sm text-slate-700 border-b pb-2">
+                      Keperluan Kunjungan
+                    </h3>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="reason">
+                        Tujuan/Keperluan Kunjungan <span className="text-red-500">*</span>
+                      </Label>
+                      <Textarea
+                        id="reason"
+                        placeholder="Jelaskan keperluan atau tujuan kunjungan Anda ke Guru BK. Contoh: Konsultasi masalah akademik, bimbingan karir, konseling pribadi, dll."
+                        value={visitForm.reason}
+                        onChange={(e) => setVisitForm({ ...visitForm, reason: e.target.value })}
+                        rows={5}
+                      />
+                      <p className="text-xs text-slate-500">
+                        Jelaskan dengan jelas agar Guru BK dapat mempersiapkan sesi konsultasi dengan baik.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Info Box */}
+                  <Card className="bg-blue-50 border-blue-200">
+                    <CardContent className="pt-4">
+                      <div className="flex gap-3">
+                        <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <div className="space-y-1 text-sm text-blue-900">
+                          <p className="font-medium">Catatan Penting:</p>
+                          <ul className="list-disc list-inside space-y-1 text-xs">
+                            <li>Pengajuan akan ditinjau oleh Guru BK</li>
+                            <li>Anda akan mendapat notifikasi status pengajuan</li>
+                            <li>Harap datang tepat waktu sesuai jadwal yang disetujui</li>
+                            <li>Hubungi BK jika ada perubahan jadwal</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsBookingOpen(false);
+                      setVisitForm({
+                        studentName: "",
+                        class: "",
+                        email: "",
+                        phone: "",
+                        visitDate: "",
+                        visitTime: "",
+                        reason: "",
+                      });
+                    }}
+                  >
+                    Batal
+                  </Button>
+                  <Button onClick={handleSubmitVisit} className="gap-2">
+                    <Send className="h-4 w-4" />
+                    Kirim Pengajuan
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {/* Info Cards */}
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="shadow-card hover:shadow-elevated transition-all">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                  <Calendar className="h-6 w-6 text-blue-600" />
+                </div>
+                <CardTitle className="text-lg">Pilih Jadwal</CardTitle>
+                <CardDescription>
+                  Tentukan tanggal dan waktu yang sesuai untuk kunjungan Anda
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="shadow-card hover:shadow-elevated transition-all">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4">
+                  <CheckCircle2 className="h-6 w-6 text-green-600" />
+                </div>
+                <CardTitle className="text-lg">Tunggu Konfirmasi</CardTitle>
+                <CardDescription>
+                  Guru BK akan meninjau dan mengkonfirmasi pengajuan Anda
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="shadow-card hover:shadow-elevated transition-all">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
+                  <User className="h-6 w-6 text-purple-600" />
+                </div>
+                <CardTitle className="text-lg">Konsultasi</CardTitle>
+                <CardDescription>
+                  Hadiri sesi konsultasi sesuai jadwal yang telah disetujui
+                </CardDescription>
+              </CardHeader>
+            </Card>
           </div>
         </section>
 
         {/* Information Card */}
-        <Card className="mt-12 bg-accent/50">
+        <Card className="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
           <CardHeader>
-            <CardTitle>How It Works</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-blue-600" />
+              Panduan Kunjungan ke BK
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <ol className="list-decimal list-inside space-y-2 text-muted-foreground">
-              <li>Select a counselor and available time slot that works for you</li>
-              <li>Your appointment request will be sent for approval</li>
-              <li>You'll receive a notification once the counselor confirms</li>
-              <li>Attend your session at the scheduled time</li>
-            </ol>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-semibold mb-3 text-slate-900">Langkah-langkah:</h4>
+                <ol className="list-decimal list-inside space-y-2 text-slate-700">
+                  <li>Klik tombol "Ajukan Kunjungan Baru"</li>
+                  <li>Lengkapi formulir dengan data yang akurat</li>
+                  <li>Pilih tanggal dan waktu yang sesuai</li>
+                  <li>Jelaskan keperluan kunjungan Anda</li>
+                  <li>Tunggu konfirmasi dari Guru BK</li>
+                  <li>Hadiri sesi sesuai jadwal yang disetujui</li>
+                </ol>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3 text-slate-900">Waktu Layanan BK:</h4>
+                <ul className="space-y-2 text-slate-700">
+                  <li className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-blue-600" />
+                    <span><strong>Senin - Jumat:</strong> 08:00 - 16:00 WIB</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-blue-600" />
+                    <span><strong>Sabtu:</strong> 08:00 - 12:00 WIB</span>
+                  </li>
+                </ul>
+                <div className="mt-4 p-3 bg-white rounded-lg border border-blue-200">
+                  <p className="text-sm text-slate-600">
+                    <strong>Catatan:</strong> Untuk keperluan mendesak, silakan hubungi ruang BK secara langsung atau melalui telepon sekolah.
+                  </p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

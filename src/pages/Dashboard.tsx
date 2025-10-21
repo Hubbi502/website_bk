@@ -60,6 +60,9 @@ const Dashboard = () => {
 
   // State untuk kunjungan murid
   const [visits, setVisits] = useState<Visit[]>([]);
+  const [filteredVisits, setFilteredVisits] = useState<Visit[]>([]);
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   
   // State untuk dialog detail kunjungan
   const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
@@ -104,7 +107,35 @@ const Dashboard = () => {
   const loadVisits = () => {
     const loadedVisits = getVisits();
     setVisits(loadedVisits);
+    setFilteredVisits(loadedVisits);
   };
+
+  // Effect untuk filter dan search
+  useEffect(() => {
+    let result = [...visits];
+
+    // Filter berdasarkan status
+    if (filterStatus !== "all") {
+      result = result.filter(v => v.status === filterStatus);
+    }
+
+    // Search berdasarkan nama atau kelas
+    if (searchQuery) {
+      result = result.filter(v => 
+        v.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        v.class.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Sort berdasarkan tanggal terbaru
+    result.sort((a, b) => {
+      const dateA = new Date(a.visitDate + ' ' + a.visitTime);
+      const dateB = new Date(b.visitDate + ' ' + b.visitTime);
+      return dateB.getTime() - dateA.getTime();
+    });
+
+    setFilteredVisits(result);
+  }, [visits, filterStatus, searchQuery]);
 
   // Fungsi untuk artikel
   const handleAddArticle = () => {
@@ -429,7 +460,10 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold text-green-600">
-                      {visits.filter(v => v.visitDate === new Date().toISOString().split('T')[0]).length}
+                      {visits.filter(v => {
+                        const today = new Date().toISOString().split('T')[0];
+                        return v.visitDate === today && (v.status === "approved" || v.status === "pending");
+                      }).length}
                     </div>
                     <p className="text-xs text-slate-500 mt-1">Jadwal hari ini</p>
                   </CardContent>
@@ -450,6 +484,72 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Kunjungan Hari Ini Section */}
+              {visits.filter(v => {
+                const today = new Date().toISOString().split('T')[0];
+                return v.visitDate === today && (v.status === "approved" || v.status === "pending");
+              }).length > 0 && (
+                <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-green-800">
+                      <Calendar className="h-5 w-5" />
+                      Kunjungan Hari Ini
+                    </CardTitle>
+                    <CardDescription className="text-green-700">
+                      {new Date().toLocaleDateString('id-ID', { 
+                        weekday: 'long', 
+                        day: 'numeric', 
+                        month: 'long', 
+                        year: 'numeric' 
+                      })}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {visits.filter(v => {
+                        const today = new Date().toISOString().split('T')[0];
+                        return v.visitDate === today && (v.status === "approved" || v.status === "pending");
+                      }).map((visit) => (
+                        <div key={visit.id} className="bg-white p-4 rounded-lg border border-green-200 hover:shadow-md transition-shadow">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-start gap-3">
+                              <Avatar className="h-12 w-12">
+                                <AvatarFallback className="bg-green-100 text-green-700 font-semibold">
+                                  {visit.studentName.substring(0, 2).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <p className="font-semibold text-slate-900">{visit.studentName}</p>
+                                <p className="text-sm text-slate-600">{visit.class}</p>
+                                <div className="flex items-center gap-2 mt-2 text-sm text-slate-600">
+                                  <Clock className="h-4 w-4 text-green-600" />
+                                  <span className="font-medium text-green-700">{visit.visitTime} WIB</span>
+                                </div>
+                                <p className="text-sm text-slate-600 mt-1 line-clamp-1">{visit.reason}</p>
+                              </div>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              {getStatusBadge(visit.status)}
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setActiveTab("visits");
+                                  setTimeout(() => handleViewDetail(visit), 100);
+                                }}
+                                className="text-xs"
+                              >
+                                Lihat Detail
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Recent Activity */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -696,97 +796,193 @@ const Dashboard = () => {
             <div className="space-y-6 animate-fade-in">
               <Card>
                 <CardHeader>
-                  <CardTitle>Data Kunjungan Murid</CardTitle>
-                  <CardDescription>
-                    Daftar murid yang akan atau sudah berkunjung ke BK
-                  </CardDescription>
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                      <CardTitle>Data Kunjungan Murid</CardTitle>
+                      <CardDescription>
+                        Daftar murid yang akan atau sudah berkunjung ke BK
+                      </CardDescription>
+                    </div>
+                    
+                    {/* Filter dan Search */}
+                    <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                      <Input
+                        placeholder="Cari nama atau kelas..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full sm:w-64"
+                      />
+                      <Select value={filterStatus} onValueChange={setFilterStatus}>
+                        <SelectTrigger className="w-full sm:w-40">
+                          <SelectValue placeholder="Filter Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Semua Status</SelectItem>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="approved">Disetujui</SelectItem>
+                          <SelectItem value="completed">Selesai</SelectItem>
+                          <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Nama Murid</TableHead>
-                        <TableHead>Kelas</TableHead>
-                        <TableHead>Tanggal</TableHead>
-                        <TableHead>Waktu</TableHead>
-                        <TableHead>Keperluan</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Aksi</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {visits.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={7} className="text-center text-slate-500">
-                            Belum ada data kunjungan
-                          </TableCell>
+                  {/* Statistics Summary */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-yellow-600" />
+                        <span className="text-sm text-yellow-700">Pending</span>
+                      </div>
+                      <p className="text-2xl font-bold text-yellow-600 mt-2">
+                        {visits.filter(v => v.status === "pending").length}
+                      </p>
+                    </div>
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm text-blue-700">Disetujui</span>
+                      </div>
+                      <p className="text-2xl font-bold text-blue-600 mt-2">
+                        {visits.filter(v => v.status === "approved").length}
+                      </p>
+                    </div>
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <span className="text-sm text-green-700">Selesai</span>
+                      </div>
+                      <p className="text-2xl font-bold text-green-600 mt-2">
+                        {visits.filter(v => v.status === "completed").length}
+                      </p>
+                    </div>
+                    <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="h-4 w-4 text-red-600" />
+                        <span className="text-sm text-red-700">Dibatalkan</span>
+                      </div>
+                      <p className="text-2xl font-bold text-red-600 mt-2">
+                        {visits.filter(v => v.status === "cancelled").length}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Table */}
+                  <div className="rounded-md border overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-slate-50">
+                          <TableHead className="font-semibold">Nama Murid</TableHead>
+                          <TableHead className="font-semibold">Kelas</TableHead>
+                          <TableHead className="font-semibold">Tanggal</TableHead>
+                          <TableHead className="font-semibold">Waktu</TableHead>
+                          <TableHead className="font-semibold">Keperluan</TableHead>
+                          <TableHead className="font-semibold">Status</TableHead>
+                          <TableHead className="font-semibold">Aksi</TableHead>
                         </TableRow>
-                      ) : (
-                        visits.map((visit) => (
-                          <TableRow key={visit.id}>
-                            <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
-                                <User className="h-4 w-4 text-slate-400" />
-                                {visit.studentName}
-                              </div>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredVisits.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={7} className="text-center text-slate-500 py-8">
+                              {searchQuery || filterStatus !== "all" 
+                                ? "Tidak ada data yang sesuai dengan filter"
+                                : "Belum ada data kunjungan"}
                             </TableCell>
-                            <TableCell>{visit.class}</TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4 text-slate-400" />
-                                {visit.visitDate}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Clock className="h-4 w-4 text-slate-400" />
-                                {visit.visitTime}
-                              </div>
-                            </TableCell>
-                            <TableCell className="max-w-xs truncate">{visit.reason}</TableCell>
-                            <TableCell>{getStatusBadge(visit.status)}</TableCell>
-                            <TableCell>
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleViewDetail(visit)}
-                                >
-                                  <FileEdit className="h-4 w-4" />
-                                </Button>
-                                {visit.status === "pending" && (
-                                  <>
-                                    <Button
-                                      size="sm"
-                                      onClick={() => handleUpdateVisitStatus(visit.id, "approved")}
-                                    >
-                                      Setujui
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="destructive"
-                                      onClick={() => handleUpdateVisitStatus(visit.id, "cancelled")}
-                                    >
-                                      Tolak
-                                    </Button>
-                                  </>
-                                )}
-                                {visit.status === "approved" && (
+                          </TableRow>
+                        ) : (
+                          filteredVisits.map((visit) => (
+                            <TableRow key={visit.id} className="hover:bg-slate-50">
+                              <TableCell className="font-medium">
+                                <div className="flex items-center gap-2">
+                                  <Avatar className="h-8 w-8">
+                                    <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
+                                      {visit.studentName.substring(0, 2).toUpperCase()}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  {visit.studentName}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline">{visit.class}</Badge>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Calendar className="h-4 w-4 text-slate-400" />
+                                  {new Date(visit.visitDate).toLocaleDateString('id-ID', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric'
+                                  })}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Clock className="h-4 w-4 text-slate-400" />
+                                  {visit.visitTime}
+                                </div>
+                              </TableCell>
+                              <TableCell className="max-w-xs">
+                                <p className="truncate text-sm">{visit.reason}</p>
+                              </TableCell>
+                              <TableCell>{getStatusBadge(visit.status)}</TableCell>
+                              <TableCell>
+                                <div className="flex gap-2">
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => handleUpdateVisitStatus(visit.id, "completed")}
+                                    onClick={() => handleViewDetail(visit)}
+                                    title="Lihat Detail"
                                   >
-                                    Selesai
+                                    <FileEdit className="h-4 w-4" />
                                   </Button>
-                                )}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
+                                  {visit.status === "pending" && (
+                                    <>
+                                      <Button
+                                        size="sm"
+                                        onClick={() => handleUpdateVisitStatus(visit.id, "approved")}
+                                        className="bg-green-600 hover:bg-green-700"
+                                        title="Setujui"
+                                      >
+                                        <CheckCircle className="h-4 w-4" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        onClick={() => handleUpdateVisitStatus(visit.id, "cancelled")}
+                                        title="Tolak"
+                                      >
+                                        <XCircle className="h-4 w-4" />
+                                      </Button>
+                                    </>
+                                  )}
+                                  {visit.status === "approved" && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleUpdateVisitStatus(visit.id, "completed")}
+                                      className="border-green-600 text-green-600 hover:bg-green-50"
+                                      title="Tandai Selesai"
+                                    >
+                                      Selesai
+                                    </Button>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  {/* Result Count */}
+                  {filteredVisits.length > 0 && (
+                    <div className="mt-4 text-sm text-slate-600">
+                      Menampilkan {filteredVisits.length} dari {visits.length} data kunjungan
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
