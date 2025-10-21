@@ -1,5 +1,4 @@
 import { Link, useLocation } from "react-router-dom";
-<<<<<<< HEAD
 import { Home, BookOpen, Calendar, Info, LayoutDashboard, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -20,13 +19,6 @@ const Navbar = () => {
     
     return () => window.removeEventListener("storage", checkAuth);
   }, [location]);
-=======
-import { Home, BookOpen, Calendar, Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
-
-const Navbar = () => {
-  const location = useLocation();
->>>>>>> 27426c0ea16f5b1e5737c5e8b79a0fd5bcd19b96
   
   const isActive = (path: string) => location.pathname === path;
   
@@ -60,7 +52,6 @@ const Navbar = () => {
                 </Button>
               </Link>
             ))}
-<<<<<<< HEAD
             {isLoggedIn ? (
               <Link to="/dashboard">
                 <Button
@@ -82,8 +73,6 @@ const Navbar = () => {
                 </Button>
               </Link>
             )}
-=======
->>>>>>> 27426c0ea16f5b1e5737c5e8b79a0fd5bcd19b96
           </div>
           
           <div className="md:hidden flex items-center space-x-1">
@@ -97,7 +86,6 @@ const Navbar = () => {
                 </Button>
               </Link>
             ))}
-<<<<<<< HEAD
             {isLoggedIn ? (
               <Link to="/dashboard">
                 <Button
@@ -117,8 +105,6 @@ const Navbar = () => {
                 </Button>
               </Link>
             )}
-=======
->>>>>>> 27426c0ea16f5b1e5737c5e8b79a0fd5bcd19b96
           </div>
         </div>
       </div>
