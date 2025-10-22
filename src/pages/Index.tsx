@@ -9,23 +9,23 @@ const Index = () => {
   const features = [
     {
       icon: BookOpen,
-      title: "Informative Articles",
-      description: "Access a wide range of articles on personal growth, mental health, and career guidance."
+      title: "Artikel Informatif",
+      description: "Akses berbagai artikel tentang pengembangan diri, kesehatan mental, dan panduan karir."
     },
     {
       icon: Calendar,
-      title: "Easy Scheduling",
-      description: "Book counseling sessions with your preferred counselor at your convenience."
+      title: "Penjadwalan Mudah",
+      description: "Pesan sesi konseling dengan konselor pilihan Anda sesuai keinginan Anda."
     },
     {
       icon: Heart,
-      title: "Mental Health Support",
-      description: "Get professional guidance and support for your mental and emotional wellbeing."
+      title: "Dukungan Kesehatan Mental",
+      description: "Dapatkan bimbingan dan dukungan profesional untuk kesejahteraan mental dan emosional Anda."
     },
     {
       icon: Users,
-      title: "Expert Counselors",
-      description: "Connect with experienced counselors dedicated to helping you succeed."
+      title: "Konselor Ahli",
+      description: "Terhubung dengan konselor berpengalaman yang berdedikasi untuk membantu Anda sukses."
     }
   ];
 
@@ -40,23 +40,23 @@ const Index = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-white animate-fade-in">
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                Welcome to <span className="block">Sahabat BK</span>
+                Selamat Datang di <span className="block">Sahabat BK</span>
               </h1>
               <p className="text-lg md:text-xl mb-8 text-white/90 leading-relaxed">
-                Your trusted companion in guidance and counseling. We're here to support your personal growth, 
-                mental health, and career development journey through accessible and effective counseling services.
+                Sahabat terpercaya Anda dalam bimbingan dan konseling. Kami di sini untuk mendukung pertumbuhan pribadi Anda, 
+                kesehatan mental, dan perjalanan pengembangan karir melalui layanan konseling yang dapat diakses dan efektif.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link to="/articles">
                   <Button size="lg" variant="secondary" className="gap-2">
                     <BookOpen className="h-5 w-5" />
-                    Explore Articles
+                    Jelajahi Artikel
                   </Button>
                 </Link>
                 <Link to="/schedule">
                   <Button size="lg" variant="outline" className="gap-2 bg-white/10 hover:bg-white/20 text-white border-white/30">
                     <Calendar className="h-5 w-5" />
-                    Schedule Session
+                    Jadwalkan Sesi
                   </Button>
                 </Link>
               </div>
@@ -64,7 +64,7 @@ const Index = () => {
             <div className="animate-slide-up hidden md:block">
               <img 
                 src={heroBanner} 
-                alt="Guidance and Counseling" 
+                alt="Bimbingan dan Konseling" 
                 className="rounded-2xl shadow-elevated"
               />
             </div>
@@ -76,11 +76,11 @@ const Index = () => {
       <section className="py-16 md:py-24 bg-card">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Mission</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Misi Kami</h2>
             <p className="text-lg text-muted-foreground">
-              Sahabat BK is dedicated to providing comprehensive guidance and counseling services 
-              that empower students to overcome challenges, discover their potential, and achieve 
-              their goals in a supportive and understanding environment.
+              Sahabat BK berdedikasi untuk menyediakan layanan bimbingan dan konseling yang komprehensif 
+              yang memberdayakan siswa untuk mengatasi tantangan, menemukan potensi mereka, dan mencapai 
+              tujuan mereka di lingkungan yang mendukung dan pengertian.
             </p>
           </div>
 
@@ -110,14 +110,14 @@ const Index = () => {
       {/* CTA Section */}
       <section className="py-16 md:py-20 gradient-subtle">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Get Started?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Siap untuk Memulai?</h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Whether you need guidance on personal matters, academic challenges, or career planning, 
-            we're here to help you every step of the way.
+            Baik Anda memerlukan bimbingan tentang masalah pribadi, tantangan akademis, atau perencanaan karir, 
+            kami di sini untuk membantu Anda di setiap langkah.
           </p>
           <Link to="/about">
             <Button size="lg" className="gap-2">
-              Learn More About Us
+              Pelajari Lebih Lanjut Tentang Kami
             </Button>
           </Link>
         </div>
