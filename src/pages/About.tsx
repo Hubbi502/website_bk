@@ -40,26 +40,28 @@ const About = () => {
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             <Card className="shadow-card">
               <CardHeader>
-                <CardTitle>Our Mission</CardTitle>
+                <CardTitle>Visi Bimbingan dan Konseling</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  To provide comprehensive, accessible, and effective guidance and counseling services that empower 
-                  students to overcome challenges, discover their potential, and achieve their goals in a supportive 
-                  and understanding environment.
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  "Terwujudnya perkembangan individu secara optimal, individu yang mandiri, individu yang mampu beradaptasi dan berguna dalam masyarakat, serta terwujudnya kehidupan kemanusiaan yang bahagia melalui layanan bimbingan dan konseling."
                 </p>
               </CardContent>
             </Card>
 
             <Card className="shadow-card">
               <CardHeader>
-                <CardTitle>Our Vision</CardTitle>
+                <CardTitle>Misi Bimbingan dan Konseling</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  To be the leading digital platform for school counseling services, creating a community where every 
-                  student feels heard, supported, and empowered to thrive academically, emotionally, and socially.
-                </p>
+                <div className="text-muted-foreground space-y-3">
+                  <p className="font-medium mb-2">Misi BK SMK Negeri 1 Cibinong antara lain:</p>
+                  <ol className="list-decimal list-inside space-y-2 text-sm">
+                    <li>Mendidik peserta didik melalui pengembangan perilaku efektif-normatif dalam kehidupan keseharian dan yang terkait masa depan melalui layanan bimbingan, baik itu kelompok ataupun klasikal dengan memperhatikan bidang pribadi, sosial, belajar, dan karier dengan beragam metode dan model bimbingan.</li>
+                    <li>Memfasilitasi perkembangan individu di dalam satuan pendidikan formal kea rah perkembangan optimal melalui strategi upaya pengembangan lingkungan belajar dan lingkungan lainnya serta kondisi tertentu sesuai dengan dinamika perkembangan masyarakat.</li>
+                    <li>Memantau dan memfasilitasi pengentasan masalah individu mengacu kepada kehidupan sehari-hari yang efektif melalui layanan konseling, baik konseling individu, kelompok, atau teman sebaya.</li>
+                  </ol>
+                </div>
               </CardContent>
             </Card>
           </div>
